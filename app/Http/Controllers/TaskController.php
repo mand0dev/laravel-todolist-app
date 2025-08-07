@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -9,6 +9,8 @@ use Illuminate\View\View;
 
 class TaskController extends Controller
 {
+    use AuthorizesRequests; // Use authorize
+    
     public function index(): View
     {
         $tasks = auth()->user()->tasks()->latest()->get();
