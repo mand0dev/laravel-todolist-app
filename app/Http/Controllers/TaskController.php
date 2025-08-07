@@ -1,16 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TaskController extends Controller
 {
-    use AuthorizesRequests; // Use authorize
-    
+    use AuthorizesRequests;
+
     public function index(): View
     {
         $tasks = auth()->user()->tasks()->latest()->get();
@@ -37,19 +38,30 @@ class TaskController extends Controller
 
     public function show(Task $task): View
     {
-        $this->authorize('view', $task);
+        // Verificar que la tarea pertenece al usuario autenticado
+        if ($task->user_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para ver esta tarea.');
+        }
+        
         return view('tasks.show', compact('task'));
     }
 
     public function edit(Task $task): View
     {
-        $this->authorize('update', $task);
+        // Verificar que la tarea pertenece al usuario autenticado
+        if ($task->user_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para editar esta tarea.');
+        }
+        
         return view('tasks.edit', compact('task'));
     }
 
     public function update(Request $request, Task $task): RedirectResponse
     {
-        $this->authorize('update', $task);
+        // Verificar que la tarea pertenece al usuario autenticado
+        if ($task->user_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para actualizar esta tarea.');
+        }
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -64,7 +76,10 @@ class TaskController extends Controller
 
     public function destroy(Task $task): RedirectResponse
     {
-        $this->authorize('delete', $task);
+        // Verificar que la tarea pertenece al usuario autenticado
+        if ($task->user_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para eliminar esta tarea.');
+        }
         
         $task->delete();
 
@@ -74,7 +89,10 @@ class TaskController extends Controller
 
     public function toggle(Task $task): RedirectResponse
     {
-        $this->authorize('update', $task);
+        // Verificar que la tarea pertenece al usuario autenticado
+        if ($task->user_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para modificar esta tarea.');
+        }
 
         if ($task->completed) {
             $task->markAsIncomplete();
@@ -88,3 +106,4 @@ class TaskController extends Controller
             ->with('success', $message);
     }
 }
+
