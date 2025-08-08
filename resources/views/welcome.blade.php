@@ -1,73 +1,114 @@
+<!-- resources/views/welcome.blade.php -->
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>TodoList App</title>
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="antialiased">
-        <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 selection:bg-red-500 selection:text-white">
-            @if (Route::has('login'))
-                <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TodoList App</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
+<body class="antialiased bg-gray-100">
+
+    <style>
+        :root {
+            --primary-blue: #033DFF;
+            --hover-gray: #1C1C1C;
+            --dark-bg: #0F172A;
+            --dark-card: #1E293B;
+            --dark-border: #334155;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            margin-left: .2em;
+            margin-right: .2em;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger {
+            background-color: #C71A1A;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        input,
+        textarea,
+        .text-status {
+            color: #1c1c1cbe;
+        }
+
+        .modal-shadow {
+            box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-pending {
+            color: #FFAC00;
+        }
+
+        .text-completed {
+            color: #28C71A;
+        }
+
+        .text-incompleted {
+            color: #C71A1A;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--hover-gray);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #0F172A;
+            color: white;
+            transition: all 0.3s ease;
+        }
+    </style>
+
+    <!-- Menú de navegación -->
+    <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url('/') }}" class="text-xl font-bold text-gray-800">
+                        TodoList App
+                    </a>
+                </div>
+
+                <div class="flex items-center space-x-4">
                     @auth
-                        <a href="{{ route('tasks.index') }}" class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Mis Tareas</a>
-                    @else
-                        <a href="{{ route('login') }}" class="font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Iniciar Sesión</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="ml-4 font-semibold text-gray-600 hover:text-gray-900 focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Registrarse</a>
-                        @endif
-                    @endauth
-                </div>
-            @endif
-
-            <div class="max-w-7xl mx-auto p-6 lg:p-8">
-                <div class="flex justify-center">
-                    <h1 class="text-6xl font-bold text-gray-900">TodoList App</h1>
-                </div>
-
-                <div class="mt-16">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        <div class="scale-100 p-6 bg-white from-gray-700/50 via-transparent rounded-lg shadow-2xl shadow-gray-500/20 ring-1 ring-inset ring-white/5 transition-all duration-250 focus:outline-none focus-visible:ring-[#FF2D20]">
-                            <div>
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Organiza tus tareas</h2>
-                                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                                    Crea, edita y organiza todas tus tareas diarias de manera sencilla. Mantén el control de lo que necesitas hacer.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="scale-100 p-6 bg-white from-gray-700/50 via-transparent rounded-lg shadow-2xl shadow-gray-500/20 ring-1 ring-inset ring-white/5 transition-all duration-250 focus:outline-none focus-visible:ring-[#FF2D20]">
-                            <div>
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900">Marca como completadas</h2>
-                                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                                    Experimenta la satisfacción de marcar tus tareas como completadas y ver tu progreso diario.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-center mt-16">
-                    @auth
-                        <a href="{{ route('tasks.index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg">
-                            Ver mis tareas
+                        <a href="{{ route('tasks.index') }}" class="text-gray-700 hover:text-gray-900">
+                            Mis Tareas
                         </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-primary text-red-600 hover:text-red-800">
+                                Cerrar Sesión
+                            </button>
+                        </form>
                     @else
-                        <div class="space-x-4">
-                            <a href="{{ route('login') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg">
-                                Iniciar Sesión
+                        <a href="{{ route('login') }}" class="btn btn-primary text-gray-700 hover:text-gray-900">
+                            Iniciar Sesión
+                        </a>
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}" class="btn btn-primary text-gray-700 hover:text-gray-900">
+                                Registro
                             </a>
-                            <a href="{{ route('register') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg text-lg">
-                                Registrarse
-                            </a>
-                        </div>
+                        @endif
                     @endauth
                 </div>
             </div>
         </div>
-    </body>
+    </nav>
+
+</body>
+
 </html>
